@@ -12,7 +12,7 @@ export default function Feed() {
   const [content, setContent] = useState("");
   const [visibility, setVisibility] = useState("");
   const [posting, setPosting] = useState(false);
-  const [imageUrl, setImageUrl] = useState(null);
+  const [imageUrl, setImageUrl] = useState("");
 
   function loadPosts() {
     return apiFetch(ENDPOINTS.posts)
@@ -41,6 +41,7 @@ export default function Feed() {
       setTitle("");
       setContent("");
       setVisibility("");
+      setImageUrl("");
       await loadPosts();
     } catch (err) {
       setError(err.message);
