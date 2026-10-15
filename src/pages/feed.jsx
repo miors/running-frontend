@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext } from "react";
+import { useCallback, useEffect, useState, useContext } from "react";
 import { ENDPOINTS } from "../helper/endpoints";
 import AuthContext from "../context/AuthContext";
 
@@ -14,16 +14,16 @@ export default function Feed() {
   const [posting, setPosting] = useState(false);
   const [imageUrl, setImageUrl] = useState("");
 
-  function loadPosts() {
+  const loadPosts = useCallback(() => {
     return apiFetch(ENDPOINTS.posts)
       .then((data) => setPosts(Array.isArray(data) ? data : data.posts || []))
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
-  }
+  }, [apiFetch]);
 
   useEffect(() => {
     loadPosts();
-  }, []);
+  }, [loadPosts]);
 
   async function handlePost(e) {
     e.preventDefault();
