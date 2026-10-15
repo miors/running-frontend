@@ -9,21 +9,56 @@ import {
 import { afterEach, beforeEach, expect, test } from "vitest";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import AuthProvider from "../components/auth-provider";
+import { ENDPOINTS } from "../helper/endpoints";
 import Feed from "../pages/feed";
 import Login from "../pages/login";
 
-afterEach(() => {
+let testPostTitle;
+
+afterEach(async () => {
   cleanup();
+  const token = localStorage.getItem("token");
   localStorage.removeItem("token");
+
+  if (token && testPostTitle) {
+    const headers = { Authorization: `Bearer ${token}` };
+    const response = await fetch(ENDPOINTS.posts, { headers });
+    expect(response.ok).toBe(true);
+
+    const body = await response.json();
+    const data = body.data ?? body;
+    const posts = Array.isArray(data) ? data : data.posts || [];
+    const testPost = posts.find((post) => post.title === testPostTitle);
+
+    if (testPost) {
+      expect(testPost.post_id).toBeTruthy();
+
+      const deleteResponse = await fetch(
+        `${ENDPOINTS.posts}/${testPost.post_id}`,
+        { method: "DELETE", headers },
+      );
+
+      if (!deleteResponse.ok) {
+        const details = await deleteResponse.text();
+        throw new Error(
+          `DELETE /posts/${testPost.post_id} failed (${deleteResponse.status}): ${details}`,
+        );
+      }
+    }
+  }
+
+  testPostTitle = null;
 });
 
 beforeEach(() => {
   localStorage.removeItem("token");
+  testPostTitle = null;
 });
 
 test("logs in and creates a post in the feed", async () => {
   const h = createElement;
   const title = `Feed integration test ${Date.now()}`;
+  testPostTitle = title;
   const content = "Post created by the feed integration test.";
 
   render(
