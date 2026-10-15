@@ -1,5 +1,5 @@
 import "./App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Signup from "./pages/signup";
 import Login from "./pages/login";
 import Feed from "./pages/feed";
@@ -49,6 +49,7 @@ function App() {
                 </RequireAuth>
               }
             />
+            <Route path="*" element={<Navigate to="/feed" replace />} />
           </Routes>
         </main>
       </BrowserRouter>
