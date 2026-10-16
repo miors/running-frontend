@@ -3,10 +3,22 @@ import AuthContext from "../context/AuthContext";
 import { useCallback, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-);
+let supabaseClient;
+
+function getSupabase() {
+  if (!supabaseClient) {
+    const url = import.meta.env.VITE_SUPABASE_URL;
+    const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+
+    if (!url || !key) {
+      throw new Error("Supabase URL or publishable key is missing");
+    }
+
+    supabaseClient = createClient(url, key);
+  }
+
+  return supabaseClient;
+}
 
 const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem("token") || null);
@@ -34,7 +46,7 @@ const AuthProvider = ({ children }) => {
   }
 
   async function signInWithOauth() {
-    supabase.auth.signInWithOAuth({
+    getSupabase.auth.signInWithOAuth({
       provider: "google",
       options: {
         redirectTo: `${window.location.origin}/auth/callback`,
@@ -46,7 +58,7 @@ const AuthProvider = ({ children }) => {
     const {
       data: { session },
       error: sessionError,
-    } = await supabase.auth.getSession();
+    } = await getSupabase.auth.getSession();
 
     if (sessionError) throw sessionError;
     if (!session?.access_token) {
