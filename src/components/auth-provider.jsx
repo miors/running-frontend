@@ -1,6 +1,12 @@
 import { ENDPOINTS } from "../helper/endpoints";
 import AuthContext from "../context/AuthContext";
-import { useState } from "react";
+import { useCallback, useState } from "react";
+import { createClient } from "@supabase/supabase-js";
+
+const supabase = createClient(
+  import.meta.env.VITE_SUPABASE_URL,
+  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+);
 
 const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem("token") || null);
@@ -26,6 +32,46 @@ const AuthProvider = ({ children }) => {
 
     return data;
   }
+
+  async function signInWithOauth() {
+    supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+  }
+
+  const completeOAuthSignIn = useCallback(async () => {
+    const {
+      data: { session },
+      error: sessionError,
+    } = await supabase.auth.getSession();
+
+    if (sessionError) throw sessionError;
+    if (!session?.access_token) {
+      throw new Error("No Supabase session found");
+    }
+
+    const response = await fetch(ENDPOINTS.oauthExchange, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+      },
+    });
+
+    const body = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      throw new Error(body.error || "Could not exchange OAuth token");
+    }
+    if (!body.token) {
+      throw new Error("Backend did not return an app token");
+    }
+
+    localStorage.setItem("token", body.token);
+    setToken(body.token);
+  }, []);
 
   async function login(email, password) {
     const data = await apiFetch(ENDPOINTS.login, {
@@ -58,7 +104,17 @@ const AuthProvider = ({ children }) => {
     return body.data ?? body;
   }
   return (
-    <AuthContext.Provider value={{ token, login, signup, apiFetch, logout }}>
+    <AuthContext.Provider
+      value={{
+        token,
+        login,
+        signup,
+        apiFetch,
+        logout,
+        signInWithOauth,
+        completeOAuthSignIn,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
