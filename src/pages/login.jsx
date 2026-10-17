@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import AuthContext from "../context/AuthContext";
 
 export default function Login() {
-  const { login } = useContext(AuthContext);
+  const { login, signInWithOauth } = useContext(AuthContext);
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -60,6 +60,14 @@ export default function Login() {
                 <div className="alert alert-danger mt-3 mb-0">{error}</div>
               )}
             </form>
+
+            <button
+              type="button"
+              className="btn btn-outline-dark w-100 mt-2"
+              onClick={signInWithOauth}
+            >
+              Continue with Google
+            </button>
 
             <p className="text-center mt-3 mb-0">
               No account? <Link to="/signup">Sign up</Link>

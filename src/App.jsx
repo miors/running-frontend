@@ -8,6 +8,7 @@ import GuestOnly from "./components/guest-only";
 import AuthProvider from "./components/auth-provider";
 import RequireAuth from "./components/require-auth";
 import UserProfile from "./pages/user-profile";
+import OAuthCallback from "./pages/oauth-callback";
 
 function App() {
   return (
@@ -49,6 +50,7 @@ function App() {
                 </RequireAuth>
               }
             />
+            <Route path="/auth/callback" element={<OAuthCallback />} />
             <Route path="*" element={<Navigate to="/feed" replace />} />
           </Routes>
         </main>

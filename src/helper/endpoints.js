@@ -8,4 +8,5 @@ export const ENDPOINTS = {
   users: `${BASE_URL}/users`,
   friends: `${BASE_URL}/friendships`,
   profile: `${BASE_URL}/profile`,
+  oauthExchange: `${BASE_URL}/auth/oauth/exchange`,
 };
