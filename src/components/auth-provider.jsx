@@ -23,9 +23,16 @@ function getSupabase() {
 const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem("token") || null);
 
-  const logout = () => {
-    localStorage.removeItem("token");
-    setToken(null);
+  const logout = async () => {
+    try {
+      const { error } = await getSupabase().auth.signOut();
+      if (error) console.error("Supabase sign-out failed:", error);
+    } catch (error) {
+      console.error("Supabase sign-out failed:", error);
+    } finally {
+      localStorage.removeItem("token");
+      setToken(null);
+    }
   };
 
   async function signup(email, password, username) {
@@ -50,6 +57,9 @@ const AuthProvider = ({ children }) => {
       provider: "google",
       options: {
         redirectTo: `${window.location.origin}/auth/callback`,
+        queryParams: {
+          prompt: "select_account",
+        },
       },
     });
   }
