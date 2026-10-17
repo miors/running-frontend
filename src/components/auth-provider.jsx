@@ -46,7 +46,7 @@ const AuthProvider = ({ children }) => {
   }
 
   async function signInWithOauth() {
-    getSupabase.auth.signInWithOAuth({
+    getSupabase().auth.signInWithOAuth({
       provider: "google",
       options: {
         redirectTo: `${window.location.origin}/auth/callback`,
@@ -58,7 +58,7 @@ const AuthProvider = ({ children }) => {
     const {
       data: { session },
       error: sessionError,
-    } = await getSupabase.auth.getSession();
+    } = await getSupabase().auth.getSession();
 
     if (sessionError) throw sessionError;
     if (!session?.access_token) {
