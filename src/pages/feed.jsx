@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, useContext } from "react";
+import { useCallback, useEffect, useState, useContext, useRef } from "react";
 import { ENDPOINTS } from "../helper/endpoints";
 import AuthContext from "../context/AuthContext";
 
@@ -12,7 +12,8 @@ export default function Feed() {
   const [content, setContent] = useState("");
   const [visibility, setVisibility] = useState("");
   const [posting, setPosting] = useState(false);
-  const [imageUrl, setImageUrl] = useState("");
+  const [imageFile, setImageFile] = useState("");
+  const imageInputRef = useRef(null);
 
   const loadPosts = useCallback(() => {
     return apiFetch(ENDPOINTS.posts)
@@ -31,17 +32,42 @@ export default function Feed() {
     if (!title.trim()) return setError("Add a title");
     if (!content.trim()) return setError("Write something first");
     if (!visibility) return setError("Choose Public or Friends-only");
-
+    if (imageFile && !imageFile.type.startsWith("image/")) {
+      setError("Please choose an image file.");
+      return;
+    }
+    if (imageFile && imageFile.size > 2 * 1024 * 1024) {
+      setError("Image must be 2 MB or smaller.");
+      return;
+    }
     setPosting(true);
     try {
+      let body;
+
+      if (imageFile) {
+        const formData = new FormData();
+        formData.append("title", title);
+        formData.append("content", content);
+        formData.append("visibility", visibility);
+        formData.append("image", imageFile);
+        body = formData;
+      } else {
+        body = JSON.stringify({ title, content, visibility });
+      }
+
       await apiFetch(ENDPOINTS.createPost, {
         method: "POST",
-        body: JSON.stringify({ title, content, visibility }),
+        body,
       });
+
+      // Keep the existing reset and loadPosts() lines here.
       setTitle("");
       setContent("");
       setVisibility("");
-      setImageUrl("");
+      setImageFile(null);
+      if (imageInputRef.current) {
+        imageInputRef.current.value = "";
+      }
       await loadPosts();
     } catch (err) {
       setError(err.message);
@@ -77,11 +103,14 @@ export default function Feed() {
           </div>
           <div>
             <input
-              type="text"
-              value={imageUrl}
-              onChange={(e) => setImageUrl(e.target.value)}
-              placeholder="Image URL"
+              ref={imageInputRef}
+              type="file"
+              accept="image/*"
+              onChange={(event) =>
+                setImageFile(event.target.files?.[0] ?? null)
+              }
             />
+            {imageFile && <p>{imageFile.name}</p>}
           </div>
 
           <div className="flex items-center justify-between pt-2">
@@ -154,6 +183,13 @@ export default function Feed() {
             <p className="text-slate-600 text-sm leading-relaxed mb-4 whitespace-pre-wrap">
               {post.content}
             </p>
+            {post.img_url && (
+              <img
+                src={post.img_url}
+                alt={`Image for ${post.title}`}
+                className="mb-4 max-h-96 w-full rounded-lg object-contain"
+              />
+            )}
             <div className="flex items-center gap-2 border-t border-slate-100 pt-3 text-xs text-slate-400 font-medium">
               <span className="text-indigo-600">
                 @{post.username || "anonymous"}

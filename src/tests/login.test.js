@@ -1,17 +1,30 @@
 import { createElement } from "react";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
-import { afterEach, beforeEach, expect, test } from "vitest";
+import { afterEach, beforeEach, expect, test, vi } from "vitest";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import AuthProvider from "../components/auth-provider";
 import Login from "../pages/login";
 
+function jsonResponse(body, status = 200) {
+  return {
+    ok: status >= 200 && status < 300,
+    status,
+    json: async () => body,
+  };
+}
+
 afterEach(() => {
   cleanup();
   localStorage.removeItem("token");
+  vi.unstubAllGlobals();
 });
 
 beforeEach(() => {
   localStorage.removeItem("token");
+  vi.stubGlobal(
+    "fetch",
+    vi.fn().mockResolvedValue(jsonResponse({ token: "test-token" })),
+  );
 });
 
 test("logs in and navigates to the feed", async () => {

@@ -6,59 +6,71 @@ import {
   screen,
   within,
 } from "@testing-library/react";
-import { afterEach, beforeEach, expect, test } from "vitest";
+import { afterEach, beforeEach, expect, test, vi } from "vitest";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import AuthProvider from "../components/auth-provider";
 import { ENDPOINTS } from "../helper/endpoints";
 import Feed from "../pages/feed";
 import Login from "../pages/login";
 
-let testPostTitle;
+let posts;
 
-afterEach(async () => {
+function jsonResponse(body, status = 200) {
+  return {
+    ok: status >= 200 && status < 300,
+    status,
+    json: async () => body,
+  };
+}
+
+afterEach(() => {
   cleanup();
-  const token = localStorage.getItem("token");
   localStorage.removeItem("token");
-
-  if (token && testPostTitle) {
-    const headers = { Authorization: `Bearer ${token}` };
-    const response = await fetch(ENDPOINTS.posts, { headers });
-    expect(response.ok).toBe(true);
-
-    const body = await response.json();
-    const data = body.data ?? body;
-    const posts = Array.isArray(data) ? data : data.posts || [];
-    const testPost = posts.find((post) => post.title === testPostTitle);
-
-    if (testPost) {
-      expect(testPost.post_id).toBeTruthy();
-
-      const deleteResponse = await fetch(
-        `${ENDPOINTS.posts}/${testPost.post_id}`,
-        { method: "DELETE", headers },
-      );
-
-      if (!deleteResponse.ok) {
-        const details = await deleteResponse.text();
-        throw new Error(
-          `DELETE /posts/${testPost.post_id} failed (${deleteResponse.status}): ${details}`,
-        );
-      }
-    }
-  }
-
-  testPostTitle = null;
+  vi.unstubAllGlobals();
 });
 
 beforeEach(() => {
   localStorage.removeItem("token");
-  testPostTitle = null;
+  posts = [];
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(async (url, options = {}) => {
+      if (url === ENDPOINTS.login) {
+        return jsonResponse({ token: "test-token" });
+      }
+
+      if (url === ENDPOINTS.posts && options.method === "POST") {
+        const postData =
+          options.body instanceof FormData
+            ? Object.fromEntries(options.body.entries())
+            : JSON.parse(options.body);
+        const post = {
+          post_id: posts.length + 1,
+          title: postData.title,
+          content: postData.content,
+          visibility: postData.visibility,
+          img_url: null,
+          created_at: new Date().toISOString(),
+          user_id: 1,
+          username: "test-user",
+        };
+
+        posts.unshift(post);
+        return jsonResponse(post, 201);
+      }
+
+      if (url === ENDPOINTS.posts) {
+        return jsonResponse(posts);
+      }
+
+      throw new Error(`Unexpected request to ${url}`);
+    }),
+  );
 });
 
 test("logs in and creates a post in the feed", async () => {
   const h = createElement;
   const title = `Feed integration test ${Date.now()}`;
-  testPostTitle = title;
   const content = "Post created by the feed integration test.";
 
   render(
