@@ -42,19 +42,25 @@ export default function Feed() {
     }
     setPosting(true);
     try {
-      const formData = new FormData();
-      formData.append("title", title);
-      formData.append("content", content);
-      formData.append("visibility", visibility);
+      let body;
 
       if (imageFile) {
+        const formData = new FormData();
+        formData.append("title", title);
+        formData.append("content", content);
+        formData.append("visibility", visibility);
         formData.append("image", imageFile);
+        body = formData;
+      } else {
+        body = JSON.stringify({ title, content, visibility });
       }
 
       await apiFetch(ENDPOINTS.createPost, {
         method: "POST",
-        body: formData,
+        body,
       });
+
+      // Keep the existing reset and loadPosts() lines here.
       setTitle("");
       setContent("");
       setVisibility("");

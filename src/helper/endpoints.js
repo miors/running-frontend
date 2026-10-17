@@ -1,5 +1,5 @@
-const BASE_URL = `https://social-backend-production-019c.up.railway.app`;
-// const BASE_URL = `http://localhost:3000`;
+// const BASE_URL = `https://social-backend-production-019c.up.railway.app`;
+const BASE_URL = `http://localhost:3000`;
 export const ENDPOINTS = {
   signup: `${BASE_URL}/signup`,
   login: `${BASE_URL}/login`,
