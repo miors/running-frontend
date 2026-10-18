@@ -12,7 +12,7 @@ export default function Feed() {
   const [content, setContent] = useState("");
   const [visibility, setVisibility] = useState("");
   const [posting, setPosting] = useState(false);
-  const [imageFile, setImageFile] = useState("");
+  const [imageFile, setImageFile] = useState(null);
   const imageInputRef = useRef(null);
 
   const loadPosts = useCallback(() => {
@@ -60,7 +60,6 @@ export default function Feed() {
         body,
       });
 
-      // Keep the existing reset and loadPosts() lines here.
       setTitle("");
       setContent("");
       setVisibility("");
@@ -77,133 +76,165 @@ export default function Feed() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto space-y-8">
-      <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-slate-800 mb-4">
-          Create a new post
-        </h2>
+    <div className="feed-page">
+      <section className="feed-hero" aria-labelledby="feed-title">
+        <div className="feed-hero__copy">
+          <p className="eyebrow">RUNNING FRIENDS CLUB</p>
+          <h1 id="feed-title">Your Feed</h1>
+          <p>
+            Good miles are better shared. Catch up with your running community.
+          </p>
+        </div>
+      </section>
 
-        <form onSubmit={handlePost} className="space-y-4">
-          <div>
-            <input
-              placeholder="Title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition text-sm font-medium"
-            />
-          </div>
-          <div>
-            <textarea
-              placeholder="What's on your mind?"
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              rows={3}
-              className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition text-sm resize-none"
-            />
-          </div>
-          <div>
-            <input
-              ref={imageInputRef}
-              type="file"
-              accept="image/*"
-              onChange={(event) =>
-                setImageFile(event.target.files?.[0] ?? null)
-              }
-            />
-            {imageFile && <p>{imageFile.name}</p>}
+      <div className="feed-layout">
+        <section className="compose-panel" aria-labelledby="compose-title">
+          <div className="panel-heading">
+            <p className="section-kicker">YOUR NEXT UPDATE</p>
+            <h2 id="compose-title">Share a run</h2>
+            <p>Tell your people what’s happening out there.</p>
           </div>
 
-          <div className="flex items-center justify-between pt-2">
-            <div className="flex items-center gap-4">
-              <label className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer select-none">
-                <input
-                  type="radio"
-                  name="visibility"
-                  value="Public"
-                  checked={visibility === "Public"}
-                  onChange={(e) => setVisibility(e.target.value)}
-                  className="w-4 h-4 text-indigo-600 focus:ring-indigo-500 border-slate-300"
-                />
-                🌐 Public
+          <form onSubmit={handlePost} className="post-form">
+            <div className="field-group">
+              <label className="field-label" htmlFor="post-title">
+                Title
               </label>
-              <label className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer select-none">
-                <input
-                  type="radio"
-                  name="visibility"
-                  value="Friends-only"
-                  checked={visibility === "Friends-only"}
-                  onChange={(e) => setVisibility(e.target.value)}
-                  className="w-4 h-4 text-indigo-600 focus:ring-indigo-500 border-slate-300"
-                />
-                👥 Friends only
+              <input
+                id="post-title"
+                className="field-input"
+                placeholder="A short headline"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+              />
+            </div>
+
+            <div className="field-group">
+              <label className="field-label" htmlFor="post-content">
+                Your update
               </label>
+              <textarea
+                id="post-content"
+                className="field-textarea"
+                placeholder="How did the run go?"
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                rows={4}
+              />
+            </div>
+
+            <div className="field-group">
+              <span className="field-label">Add a photo</span>
+              <label className="upload-control" htmlFor="post-image">
+                <span className="upload-copy">
+                  {imageFile ? imageFile.name : "Choose an image"}
+                  <small>JPG, PNG or WebP · up to 2 MiB</small>
+                </span>
+                <input
+                  ref={imageInputRef}
+                  id="post-image"
+                  className="file-input"
+                  type="file"
+                  accept="image/*"
+                  onChange={(event) =>
+                    setImageFile(event.target.files?.[0] ?? null)
+                  }
+                />
+              </label>
+            </div>
+
+            <div className="visibility-row">
+              <span className="field-label">Who can see this?</span>
+              <div className="visibility-choices">
+                <label className="visibility-option">
+                  <input
+                    type="radio"
+                    name="visibility"
+                    value="Public"
+                    checked={visibility === "Public"}
+                    onChange={(e) => setVisibility(e.target.value)}
+                  />
+                  Public
+                </label>
+                <label className="visibility-option">
+                  <input
+                    type="radio"
+                    name="visibility"
+                    value="Friends-only"
+                    checked={visibility === "Friends-only"}
+                    onChange={(e) => setVisibility(e.target.value)}
+                  />
+                  Friends only
+                </label>
+              </div>
             </div>
 
             <button
+              className="button-primary publish-button"
               type="submit"
               disabled={posting}
-              className="bg-indigo-600 text-white font-medium text-sm px-5 py-2 rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition shadow-sm"
             >
-              {posting ? "Posting..." : "Post"}
+              <span aria-hidden="true">+</span>
+              {posting ? "Publishing..." : "Publish update"}
             </button>
-          </div>
-        </form>
+          </form>
 
-        {error && (
-          <div className="mt-4 p-3 bg-rose-50 text-rose-600 text-sm font-medium rounded-lg border border-rose-100">
-            ⚠ {error}
-          </div>
-        )}
-      </div>
-
-      <div className="space-y-4">
-        <h1 className="text-2xl font-bold tracking-tight text-slate-950">
-          Your Feed
-        </h1>
-
-        {loading && (
-          <p className="text-center text-slate-500 text-sm py-8">
-            Loading posts...
-          </p>
-        )}
-        {!loading && posts.length === 0 && (
-          <div className="text-center bg-white border border-slate-200 rounded-xl p-8 text-slate-500 text-sm shadow-sm">
-            No posts yet. Connect with users to build your feed!
-          </div>
-        )}
-
-        {posts.map((post) => (
-          <article
-            key={post.post_id}
-            className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm hover:shadow-md transition"
-          >
-            <h3 className="text-lg font-bold text-slate-900 mb-2">
-              {post.title}
-            </h3>
-            <p className="text-slate-600 text-sm leading-relaxed mb-4 whitespace-pre-wrap">
-              {post.content}
+          {error && (
+            <p className="form-error" role="alert">
+              {error}
             </p>
-            {post.img_url && (
-              <img
-                src={post.img_url}
-                alt={`Image for ${post.title}`}
-                className="mb-4 max-h-96 w-full rounded-lg object-contain"
-              />
-            )}
-            <div className="flex items-center gap-2 border-t border-slate-100 pt-3 text-xs text-slate-400 font-medium">
-              <span className="text-indigo-600">
-                @{post.username || "anonymous"}
-              </span>
-              <span>visibility: {post.visibility}</span>
-              {post.created_at && (
-                <>
-                  <span>•</span>
-                  <span>{new Date(post.created_at).toLocaleString()}</span>
-                </>
-              )}
+          )}
+        </section>
+
+        <section className="feed-stream" aria-labelledby="stream-title">
+          <div className="stream-heading">
+            <h2 id="stream-title">Community feed</h2>
+            <span className="stream-label">Latest updates</span>
+          </div>
+
+          {loading && (
+            <div className="loading-state" role="status">
+              <p>Loading your community feed...</p>
             </div>
-          </article>
-        ))}
+          )}
+
+          {!loading && posts.length === 0 && (
+            <div className="empty-state">
+              <strong>A fresh start.</strong>
+              <p>Your community’s updates will show up here.</p>
+            </div>
+          )}
+
+          <div className="post-list">
+            {posts.map((post) => (
+              <article key={post.post_id} className="post-card">
+                <div className="post-author-row">
+                  <span className="post-avatar" aria-hidden="true">
+                    {(post.username || "A").slice(0, 1).toUpperCase()}
+                  </span>
+                  <div className="post-author">
+                    <strong>@{post.username || "anonymous"}</strong>
+                    {post.created_at && (
+                      <span className="post-date">
+                        {new Date(post.created_at).toLocaleString()}
+                      </span>
+                    )}
+                  </div>
+                  <span className="visibility-badge">{post.visibility}</span>
+                </div>
+                <h3>{post.title}</h3>
+                <p className="post-content">{post.content}</p>
+                {post.img_url && (
+                  <img
+                    className="post-image"
+                    src={post.img_url}
+                    alt={`Image for ${post.title}`}
+                  />
+                )}
+              </article>
+            ))}
+          </div>
+        </section>
       </div>
     </div>
   );

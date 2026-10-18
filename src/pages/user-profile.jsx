@@ -17,7 +17,6 @@ export default function UserProfile() {
         });
 
         const data = await res.json();
-        console.log(data);
         if (!res.ok) throw new Error(data.error || "User not found");
 
         setUser(data);
@@ -29,15 +28,51 @@ export default function UserProfile() {
     loadUser();
   }, []);
 
-  if (error) return <p>{error}</p>;
-  if (!user) return <p>Loading profile...</p>;
+  if (error) {
+    return (
+      <div className="page-state profile-error" role="alert">
+        <p>{error}</p>
+      </div>
+    );
+  }
+  if (!user) {
+    return (
+      <div className="page-state" role="status">
+        <p>Loading your athlete profile...</p>
+      </div>
+    );
+  }
 
   return (
-    <div>
-      <h1>{user.username}</h1>
-      <p>Email: {user.email}</p>
-      <p>Average Heart Rate: {user.average_heart_rate ?? "N/A"}</p>
-      <p>Experience Level: {user.experience_level ?? "N/A"}</p>
+    <div className="profile-page">
+      <header className="profile-page-header">
+        <p className="section-kicker">ATHLETE PROFILE</p>
+        <h1 className="profile-title">Your running profile</h1>
+      </header>
+
+      <section className="profile-panel" aria-labelledby="profile-name">
+        <header className="profile-identity">
+          <span className="profile-avatar" aria-hidden="true">
+            {(user.username || "R").slice(0, 1).toUpperCase()}
+          </span>
+          <div>
+            <h2 id="profile-name">{user.username}</h2>
+            <p>{user.email}</p>
+          </div>
+        </header>
+
+        <h3 className="profile-stats-heading">Running stats</h3>
+        <div className="profile-stats">
+          <div className="profile-stat">
+            <span>Average heart rate</span>
+            <strong>{user.average_heart_rate ?? "N/A"}</strong>
+          </div>
+          <div className="profile-stat">
+            <span>Experience level</span>
+            <strong>{user.experience_level ?? "N/A"}</strong>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

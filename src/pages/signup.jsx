@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import AuthContext from "../context/AuthContext";
+import Brand from "../components/brand";
 
 export default function Signup() {
   const navigate = useNavigate();
@@ -23,62 +24,85 @@ export default function Signup() {
   }
 
   return (
-    <div className="row justify-content-center mt-5">
-      <div className="col-md-5">
-        <div className="card shadow-sm border-0">
-          <div className="card-body p-4 p-md-5">
-            <h2 className="text-center mb-4">Create account</h2>
+    <section className="auth-page">
+      <div className="auth-form-panel">
+        <Brand />
 
-            <form onSubmit={handleSubmit}>
-              <div className="mb-3">
-                <label className="form-label">Username</label>
-                <input
-                  className="form-control"
-                  placeholder="Choose a username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                />
-              </div>
-
-              <div className="mb-3">
-                <label className="form-label">Email</label>
-                <input
-                  type="email"
-                  className="form-control"
-                  placeholder="you@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </div>
-
-              <div className="mb-3">
-                <label className="form-label">Password</label>
-                <input
-                  type="password"
-                  className="form-control"
-                  placeholder="Create a password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-              </div>
-
-              <button type="submit" className="btn btn-primary w-100">
-                Sign up
-              </button>
-
-              {error && (
-                <div className="alert alert-danger mt-3 mb-0">{error}</div>
-              )}
-            </form>
-
-            <p className="text-center mt-3 mb-0">
-              Have an account? <Link to="/login">Log in</Link>
-            </p>
-          </div>
+        <div className="auth-copy">
+          <p className="eyebrow">FIND YOUR PACE</p>
+          <h1>Create account</h1>
+          <p>Make room for more good miles and good company.</p>
         </div>
+
+        <form className="auth-form" onSubmit={handleSubmit}>
+          <div className="field-group">
+            <label className="field-label" htmlFor="signup-username">
+              Username
+            </label>
+            <input
+              id="signup-username"
+              className="field-input"
+              placeholder="Choose a username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              autoComplete="username"
+              required
+            />
+          </div>
+
+          <div className="field-group">
+            <label className="field-label" htmlFor="signup-email">
+              Email
+            </label>
+            <input
+              id="signup-email"
+              type="email"
+              className="field-input"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              autoComplete="email"
+              required
+            />
+          </div>
+
+          <div className="field-group">
+            <label className="field-label" htmlFor="signup-password">
+              Password
+            </label>
+            <input
+              id="signup-password"
+              type="password"
+              className="field-input"
+              placeholder="Create a password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete="new-password"
+              required
+            />
+          </div>
+
+          <button type="submit" className="button-primary">
+            Sign up
+          </button>
+          {error && (
+            <p className="auth-error" role="alert">
+              {error}
+            </p>
+          )}
+        </form>
+
+        <p className="auth-switch">
+          Have an account? <Link to="/login">Log in</Link>
+        </p>
       </div>
-    </div>
+
+      <aside className="auth-visual" aria-label="Runners on a group run">
+        <div className="auth-visual__copy">
+          <span>RUN YOUR WAY</span>
+          <p>Every pace belongs. Every story counts.</p>
+        </div>
+      </aside>
+    </section>
   );
 }

@@ -1,47 +1,42 @@
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { useContext } from "react";
 import AuthContext from "../context/AuthContext";
+import Brand from "./brand";
 
 function Nav() {
   const { token, logout } = useContext(AuthContext);
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm sticky-top">
-      <div className="container">
-        <Link className="navbar-brand fw-bold" to="/feed">
-          Running Social
-        </Link>
+    <header className="site-header">
+      <nav className="site-nav" aria-label="Main navigation">
+        <Brand />
 
-        <div className="ms-auto d-flex align-items-center gap-2">
+        <div className="nav-actions">
           {!token ? (
             <>
-              <Link className="btn btn-outline-light btn-sm" to="/login">
+              <NavLink className="nav-link" to="/login">
                 Login
-              </Link>
-              <Link className="btn btn-light btn-sm" to="/signup">
+              </NavLink>
+              <NavLink className="nav-link nav-link--bright" to="/signup">
                 Sign up
-              </Link>
+              </NavLink>
             </>
           ) : (
             <>
-              <Link className="nav-link text-white" to="/feed">
+              <NavLink className="nav-link" to="/feed">
                 Feed
-              </Link>
-              <Link className="nav-link text-white" to="/profile">
+              </NavLink>
+              <NavLink className="nav-link" to="/profile">
                 Profile
-              </Link>
-              <button
-                type="button"
-                className="btn btn-outline-light btn-sm"
-                onClick={logout}
-              >
+              </NavLink>
+              <button type="button" className="nav-button" onClick={logout}>
                 Log out
               </button>
             </>
           )}
         </div>
-      </div>
-    </nav>
+      </nav>
+    </header>
   );
 }
 

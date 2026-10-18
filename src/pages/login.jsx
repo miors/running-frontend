@@ -1,6 +1,7 @@
 import { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AuthContext from "../context/AuthContext";
+import Brand from "../components/brand";
 
 export default function Login() {
   const { login, signInWithOauth } = useContext(AuthContext);
@@ -21,60 +22,79 @@ export default function Login() {
   }
 
   return (
-    <div className="row justify-content-center mt-5">
-      <div className="col-md-5">
-        <div className="card shadow-sm border-0">
-          <div className="card-body p-4 p-md-5">
-            <h2 className="text-center mb-4">Log in</h2>
+    <section className="auth-page">
+      <div className="auth-form-panel">
+        <Brand />
 
-            <form onSubmit={handleSubmit}>
-              <div className="mb-3">
-                <label className="form-label">Email</label>
-                <input
-                  type="email"
-                  className="form-control"
-                  placeholder="you@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </div>
-
-              <div className="mb-3">
-                <label className="form-label">Password</label>
-                <input
-                  type="password"
-                  className="form-control"
-                  placeholder="Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-              </div>
-
-              <button type="submit" className="btn btn-primary w-100">
-                Log in
-              </button>
-
-              {error && (
-                <div className="alert alert-danger mt-3 mb-0">{error}</div>
-              )}
-            </form>
-
-            <button
-              type="button"
-              className="btn btn-outline-dark w-100 mt-2"
-              onClick={signInWithOauth}
-            >
-              Continue with Google
-            </button>
-
-            <p className="text-center mt-3 mb-0">
-              No account? <Link to="/signup">Sign up</Link>
-            </p>
-          </div>
+        <div className="auth-copy">
+          <p className="eyebrow">GOOD TO HAVE YOU BACK</p>
+          <h1>Log in</h1>
+          <p>Your running people are just ahead.</p>
         </div>
+
+        <form className="auth-form" onSubmit={handleSubmit}>
+          <div className="field-group">
+            <label className="field-label" htmlFor="login-email">
+              Email
+            </label>
+            <input
+              id="login-email"
+              type="email"
+              className="field-input"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              autoComplete="email"
+              required
+            />
+          </div>
+
+          <div className="field-group">
+            <label className="field-label" htmlFor="login-password">
+              Password
+            </label>
+            <input
+              id="login-password"
+              type="password"
+              className="field-input"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete="current-password"
+              required
+            />
+          </div>
+
+          <button type="submit" className="button-primary">
+            Log in
+          </button>
+          {error && (
+            <p className="auth-error" role="alert">
+              {error}
+            </p>
+          )}
+        </form>
+
+        <div className="auth-divider">or</div>
+        <button
+          type="button"
+          className="button-secondary auth-google"
+          onClick={signInWithOauth}
+        >
+          Continue with Google
+        </button>
+
+        <p className="auth-switch">
+          No account? <Link to="/signup">Sign up</Link>
+        </p>
       </div>
-    </div>
+
+      <aside className="auth-visual" aria-label="Runners on a group run">
+        <div className="auth-visual__copy">
+          <span>ONE MORE MILE</span>
+          <p>Small steps. Big days. Better together.</p>
+        </div>
+      </aside>
+    </section>
   );
 }

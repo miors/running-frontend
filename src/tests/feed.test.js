@@ -100,14 +100,14 @@ test("logs in and creates a post in the feed", async () => {
 
   await screen.findByRole("heading", { name: "Your Feed" }, { timeout: 15000 });
 
-  fireEvent.change(screen.getByPlaceholderText("Title"), {
+  fireEvent.change(screen.getByLabelText("Title"), {
     target: { value: title },
   });
-  fireEvent.change(screen.getByPlaceholderText("What's on your mind?"), {
+  fireEvent.change(screen.getByLabelText("Your update"), {
     target: { value: content },
   });
   fireEvent.click(screen.getByDisplayValue("Public"));
-  fireEvent.click(screen.getByRole("button", { name: "Post" }));
+  fireEvent.click(screen.getByRole("button", { name: "Publish update" }));
 
   const postHeading = await screen.findByRole(
     "heading",

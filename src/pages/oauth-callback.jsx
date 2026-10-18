@@ -21,12 +21,26 @@ export default function OAuthCallback() {
 
   if (error) {
     return (
-      <div className="alert alert-danger" role="alert">
+      <section className="oauth-status" role="alert">
+        <span className="status-mark" aria-hidden="true">
+          !
+        </span>
+        <h1>Sign-in could not finish</h1>
         <p>{error}</p>
-        <Link to="/login">Back to login</Link>
-      </div>
+        <Link className="auth-back-link" to="/login">
+          Back to login
+        </Link>
+      </section>
     );
   }
 
-  return <p role="status">Finishing Google sign-in...</p>;
+  return (
+    <section className="oauth-status" role="status">
+      <span className="status-mark" aria-hidden="true">
+        ...
+      </span>
+      <h1>Finishing sign-in</h1>
+      <p>Connecting your account to the running community.</p>
+    </section>
+  );
 }
