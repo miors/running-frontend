@@ -15,7 +15,7 @@ function App() {
     <AuthProvider>
       <BrowserRouter>
         <Nav />
-        <main className="container py-4">
+        <main className="app-main">
           <Routes>
             <Route
               path="/signup"
